@@ -1,0 +1,223 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { getProductBySlug } from '../../lib/api';
+
+const { slug } = Astro.params;
+
+if (!slug) {
+  return Astro.redirect('/productos');
+}
+
+let product = null;
+let error = null;
+
+try {
+  product = await getProductBySlug(slug);
+} catch (e) {
+  error = 'producto no encontrado';
+  console.error(e);
+}
+
+if (error || !product) {
+  return Astro.redirect('/productos');
+}
+---
+
+<Layout title={`${product.name} - LabMedical`}>
+  <div class="product-detail">
+    <div class="container">
+      <a href="/productos" class="back-link">&larr; Volver al catalogo</a>
+      
+      <div class="product-content">
+        <div class="product-images">
+          {product.image_url ? (
+            <img src={product.image_url} alt={product.name} class="main-image" />
+          ) : (
+            <div class="no-image-large">Sin imagen disponible</div>
+          )}
+          
+          {product.additional_images && product.additional_images.length > 0 && (
+            <div class="additional-images">
+              {product.additional_images.map((img: string) => (
+                <img src={img} alt={product.name} class="thumb-image" />
+              ))}
+            </div>
+          )}
+        </div>
+
+        <div class="product-info">
+          <h1>{product.name}</h1>
+          <p class="description">{product.description}</p>
+
+          {Object.keys(product.specifications).length > 0 && (
+            <div class="specifications">
+              <h2>Especificaciones</h2>
+              <dl>
+                {Object.entries(product.specifications).map(([key, value]) => (
+                  <>
+                    <dt>{key}</dt>
+                    <dd>{String(value)}</dd>
+                  </>
+                ))}
+              </dl>
+            </div>
+          )}
+
+          {Object.keys(product.regulatory_info).length > 0 && (
+            <div class="regulatory">
+              <h2>Informacion Regulatoria</h2>
+              <dl>
+                {Object.entries(product.regulatory_info).map(([key, value]) => (
+                  <>
+                    <dt>{key}</dt>
+                    <dd>{String(value)}</dd>
+                  </>
+                ))}
+              </dl>
+            </div>
+          )}
+
+          <div class="actions">
+            <a href="/cotizacion" class="btn-quote">Solicitar Cotizacion</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .product-detail {
+    padding: 2rem;
+    min-height: 60vh;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .back-link {
+    display: inline-block;
+    color: #1e40af;
+    text-decoration: none;
+    margin-bottom: 2rem;
+    font-weight: 500;
+  }
+
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .product-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+  }
+
+  @media (max-width: 768px) {
+    .product-content {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .product-images {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .main-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    background: #f3f4f6;
+  }
+
+  .no-image-large {
+    width: 100%;
+    height: 400px;
+    background: #f3f4f6;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #9ca3af;
+  }
+
+  .additional-images {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+  }
+
+  .thumb-image {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 2px solid transparent;
+  }
+
+  .thumb-image:hover {
+    border-color: #1e40af;
+  }
+
+  .product-info h1 {
+    font-size: 2rem;
+    color: #1f2937;
+    margin-bottom: 1rem;
+  }
+
+  .description {
+    color: #6b7280;
+    line-height: 1.8;
+    margin-bottom: 2rem;
+  }
+
+  .specifications, .regulatory {
+    margin-bottom: 2rem;
+  }
+
+  .specifications h2, .regulatory h2 {
+    font-size: 1.25rem;
+    color: #1e40af;
+    margin-bottom: 1rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+  }
+
+  dt {
+    font-weight: 600;
+    color: #374151;
+  }
+
+  dd {
+    color: #6b7280;
+  }
+
+  .actions {
+    margin-top: 2rem;
+  }
+
+  .btn-quote {
+    display: inline-block;
+    padding: 1rem 2rem;
+    background: #1e40af;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: background 0.2s;
+  }
+
+  .btn-quote:hover {
+    background: #1e3a8a;
+  }
+</style>
