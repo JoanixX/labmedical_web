@@ -1,0 +1,211 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { getProducts, getCategories } from '../lib/api';
+
+// obtener productos y categorias
+let products = [];
+let categories = [];
+let error = null;
+
+try {
+  const productsData = await getProducts({ limit: 12 });
+  products = productsData.products;
+  categories = await getCategories();
+} catch (e) {
+  error = 'error al cargar productos';
+  console.error(e);
+}
+---
+
+<Layout title="Productos - LabMedical">
+  <div class="products-page">
+    <div class="container">
+      <h1>Catalogo de Productos</h1>
+      
+      {error && (
+        <div class="error-message">
+          <p>{error}</p>
+          <p>Por favor, asegurese de que el backend este ejecutandose.</p>
+        </div>
+      )}
+
+      {!error && categories.length > 0 && (
+        <div class="categories">
+          <h2>Categorias</h2>
+          <div class="category-list">
+            <a href="/productos" class="category-chip active">Todas</a>
+            {categories.map(cat => (
+              <a href={`/productos?category=${cat.slug}`} class="category-chip">
+                {cat.name}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {!error && products.length > 0 && (
+        <div class="products-grid">
+          {products.map(product => (
+            <div class="product-card">
+              <div class="product-image">
+                {product.image_url ? (
+                  <img src={product.image_url} alt={product.name} />
+                ) : (
+                  <div class="no-image">Sin imagen</div>
+                )}
+              </div>
+              <div class="product-info">
+                <h3>{product.name}</h3>
+                <p class="description">{product.description}</p>
+                <a href={`/productos/${product.slug}`} class="btn-view">
+                  Ver Detalles
+                </a>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {!error && products.length === 0 && (
+        <div class="no-products">
+          <p>No hay productos disponibles en este momento.</p>
+        </div>
+      )}
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .products-page {
+    padding: 2rem;
+    min-height: 60vh;
+  }
+
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 2rem;
+    color: #1e40af;
+  }
+
+  .error-message {
+    background: #fee2e2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 2rem;
+  }
+
+  .categories {
+    margin-bottom: 2rem;
+  }
+
+  .categories h2 {
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+  }
+
+  .category-list {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .category-chip {
+    padding: 0.5rem 1rem;
+    background: white;
+    border: 1px solid #e5e7eb;
+    border-radius: 20px;
+    text-decoration: none;
+    color: #374151;
+    transition: all 0.2s;
+  }
+
+  .category-chip:hover, .category-chip.active {
+    background: #1e40af;
+    color: white;
+    border-color: #1e40af;
+  }
+
+  .products-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 2rem;
+  }
+
+  .product-card {
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+
+  .product-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  }
+
+  .product-image {
+    width: 100%;
+    height: 200px;
+    background: #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .no-image {
+    color: #9ca3af;
+  }
+
+  .product-info {
+    padding: 1.5rem;
+  }
+
+  .product-info h3 {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: #1f2937;
+  }
+
+  .description {
+    color: #6b7280;
+    margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .btn-view {
+    display: inline-block;
+    padding: 0.5rem 1.5rem;
+    background: #1e40af;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
+
+  .btn-view:hover {
+    background: #1e3a8a;
+  }
+
+  .no-products {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: #6b7280;
+  }
+</style>
