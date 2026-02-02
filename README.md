@@ -29,7 +29,6 @@ labmedical_web/
 - **Framework**: Astro 4.x
 - **Lenguaje**: TypeScript
 - **Estilos**: TailwindCSS
-- **Islas**: React
 - **Hosting**: Vercel
 
 ## Funcionalidades
