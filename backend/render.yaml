@@ -1,0 +1,36 @@
+services:
+  - type: web
+    name: labmedical-api
+    env: rust
+    buildCommand: cargo build --release
+    startCommand: ./target/release/labmedical_api
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: labmedical-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RUST_LOG
+        value: info
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_REGION
+        value: us-east-1
+      - key: AWS_S3_BUCKET
+        value: labmedical-products
+      - key: EMAIL_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: noreply@labmedical.com
+      - key: EMAIL_TO
+        value: ventas@labmedical.com
+      - key: CORS_ORIGIN
+        value: https://labmedical.vercel.app
+
+databases:
+  - name: labmedical-db
+    databaseName: labmedical
+    user: labmedical

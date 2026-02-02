@@ -1,0 +1,23 @@
+# Backend (Rust)
+backend/target/
+backend/.env
+backend/Cargo.lock
+
+# Frontend (Node)
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.astro/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
