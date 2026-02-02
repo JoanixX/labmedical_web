@@ -1,0 +1,239 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Solicitar Cotizacion - LabMedical">
+  <div class="quote-page">
+    <div class="container">
+      <h1>Solicitar Cotizacion</h1>
+      <p class="subtitle">Complete el formulario y nos pondremos en contacto con usted</p>
+
+      <form id="quoteForm" class="quote-form">
+        <div class="form-section">
+          <h2>Informacion de la Empresa</h2>
+          
+          <div class="form-group">
+            <label for="company_name">Nombre de la Empresa *</label>
+            <input type="text" id="company_name" name="company_name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="company_tax_id">RUC *</label>
+            <input type="text" id="company_tax_id" name="company_tax_id" required />
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Informacion de Contacto</h2>
+          
+          <div class="form-group">
+            <label for="contact_name">Nombre del Contacto *</label>
+            <input type="text" id="contact_name" name="contact_name" required />
+          </div>
+
+          <div class="form-group">
+            <label for="email">Email *</label>
+            <input type="email" id="email" name="email" required />
+          </div>
+
+          <div class="form-group">
+            <label for="phone">Telefono *</label>
+            <input type="tel" id="phone" name="phone" required />
+          </div>
+        </div>
+
+        <div class="form-section">
+          <h2>Detalles de la Cotizacion</h2>
+          
+          <div class="form-group">
+            <label for="estimated_quantity">Cantidad Estimada *</label>
+            <input type="text" id="estimated_quantity" name="estimated_quantity" required 
+                   placeholder="Ej: 10 unidades" />
+          </div>
+
+          <div class="form-group">
+            <label for="message">Mensaje Adicional</label>
+            <textarea id="message" name="message" rows="5" 
+                      placeholder="Describa sus necesidades o consultas..."></textarea>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit">Enviar Cotizacion</button>
+        </div>
+
+        <div id="formMessage" class="form-message"></div>
+      </form>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .quote-page {
+    padding: 2rem;
+    min-height: 60vh;
+  }
+
+  .container {
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    color: #1e40af;
+    margin-bottom: 0.5rem;
+  }
+
+  .subtitle {
+    color: #6b7280;
+    margin-bottom: 2rem;
+  }
+
+  .quote-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+  }
+
+  .form-section h2 {
+    font-size: 1.25rem;
+    color: #374151;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #e5e7eb;
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+  }
+
+  input, textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-family: inherit;
+    transition: border-color 0.2s;
+  }
+
+  input:focus, textarea:focus {
+    outline: none;
+    border-color: #1e40af;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .form-actions {
+    margin-top: 2rem;
+  }
+
+  .btn-submit {
+    width: 100%;
+    padding: 1rem 2rem;
+    background: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .btn-submit:hover {
+    background: #1e3a8a;
+  }
+
+  .btn-submit:disabled {
+    background: #9ca3af;
+    cursor: not-allowed;
+  }
+
+  .form-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    border-radius: 6px;
+    display: none;
+  }
+
+  .form-message.success {
+    display: block;
+    background: #d1fae5;
+    color: #065f46;
+    border: 1px solid #10b981;
+  }
+
+  .form-message.error {
+    display: block;
+    background: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #ef4444;
+  }
+</style>
+
+<script>
+  // manejo del formulario de cotizacion
+  const form = document.getElementById('quoteForm') as HTMLFormElement;
+  const messageDiv = document.getElementById('formMessage') as HTMLDivElement;
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Enviando...';
+
+    const formData = new FormData(form);
+    const data = {
+      company_name: formData.get('company_name') as string,
+      company_tax_id: formData.get('company_tax_id') as string,
+      contact_name: formData.get('contact_name') as string,
+      email: formData.get('email') as string,
+      phone: formData.get('phone') as string,
+      product_ids: [1], // por ahora un producto de ejemplo
+      estimated_quantity: formData.get('estimated_quantity') as string,
+      message: formData.get('message') as string || '',
+    };
+
+    try {
+      const apiUrl = import.meta.env.PUBLIC_API_URL || 'http://localhost:3000';
+      const response = await fetch(`${apiUrl}/api/quotes`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        throw new Error('error al enviar cotizacion');
+      }
+
+      messageDiv.className = 'form-message success';
+      messageDiv.textContent = 'Cotizacion enviada exitosamente. Nos pondremos en contacto pronto.';
+      form.reset();
+    } catch (error) {
+      messageDiv.className = 'form-message error';
+      messageDiv.textContent = 'Error al enviar la cotizacion. Por favor intente nuevamente.';
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = 'Enviar Cotizacion';
+    }
+  });
+</script>
