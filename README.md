@@ -144,8 +144,8 @@ Propietario - LabMedical
 
 ## Contacto
 
-Para preguntas o soporte, contactar: ventas@labmedical.com
+Para preguntas o soporte, contactar: alvaradocjosorio@gmail.com
 
 ---
 
-Construido con ❤️ para LabMedical
+Construido para LabMedical
