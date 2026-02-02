@@ -7,6 +7,9 @@ backend/Cargo.lock
 frontend/node_modules/
 frontend/dist/
 frontend/.env
+frontend/.env.local
+frontend/.env.production
+frontend/.env.development
 frontend/.astro/
 
 # IDEs
@@ -21,3 +24,14 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Environment files (except examples)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+
+# Allow example env files
+!.env.example
+!**/.env.example
