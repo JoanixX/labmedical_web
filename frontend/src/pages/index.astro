@@ -3,22 +3,117 @@ import Layout from '../layouts/Layout.astro';
 ---
 
 <Layout title="LabMedical - Catalogo Medico B2B">
-  <main>
-    <h1>LabMedical</h1>
-    <p>Plataforma de catalogo medico B2B</p>
-  </main>
+  <section class="hero">
+    <div class="container">
+      <h1>Equipos Medicos de Calidad</h1>
+      <p>Proveedor profesional de equipamiento medico para instituciones de salud</p>
+      <div class="cta-buttons">
+        <a href="/productos" class="btn btn-primary">Ver Catalogo</a>
+        <a href="/cotizacion" class="btn btn-secondary">Solicitar Cotizacion</a>
+      </div>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="container">
+      <h2>Por que elegirnos</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <h3>Calidad Garantizada</h3>
+          <p>Productos certificados y de marcas reconocidas</p>
+        </div>
+        <div class="feature-card">
+          <h3>Atencion Personalizada</h3>
+          <p>Equipo de ventas especializado en el sector medico</p>
+        </div>
+        <div class="feature-card">
+          <h3>Entrega Rapida</h3>
+          <p>Stock disponible y envios a nivel nacional</p>
+        </div>
+      </div>
+    </div>
+  </section>
 </Layout>
 
 <style>
-  main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 2rem;
+  .hero {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+    color: white;
+    padding: 6rem 2rem;
+    text-align: center;
   }
 
-  h1 {
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .hero h1 {
     font-size: 3rem;
     font-weight: 700;
+    margin-bottom: 1rem;
+  }
+
+  .hero p {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+
+  .btn {
+    padding: 0.75rem 2rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s;
+  }
+
+  .btn:hover {
+    transform: translateY(-2px);
+  }
+
+  .btn-primary {
+    background: white;
+    color: #1e40af;
+  }
+
+  .btn-secondary {
+    background: rgba(255,255,255,0.2);
+    color: white;
+    border: 2px solid white;
+  }
+
+  .features {
+    padding: 4rem 2rem;
+  }
+
+  .features h2 {
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 3rem;
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+
+  .feature-card h3 {
+    color: #1e40af;
     margin-bottom: 1rem;
   }
 </style>
