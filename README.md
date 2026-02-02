@@ -62,6 +62,14 @@ Esta es una **plataforma B2B**, no un sitio de comercio electronico:
 
 ## Comenzando
 
+### Prerequisitos
+
+- Rust 1.70+ (para backend)
+- Node.js 18+ (para frontend)
+- PostgreSQL 14+
+- Cuenta AWS S3
+- Cuenta Resend para emails
+
 ### Configuracion del Backend
 
 Ver [backend/README.md](./backend/README.md) para instrucciones detalladas.
@@ -71,13 +79,51 @@ Inicio rapido:
 ```bash
 cd backend
 cp .env.example .env
-# configurar .env con tus credenciales
+# editar .env con tus credenciales
+cargo install sqlx-cli
+sqlx migrate run
 cargo run
 ```
 
+El backend estara disponible en `http://localhost:3000`
+
 ### Configuracion del Frontend
 
-Proximamente...
+Ver [frontend/README.md](./frontend/README.md) para instrucciones detalladas.
+
+Inicio rapido:
+
+```bash
+cd frontend
+cp .env.example .env
+# editar .env si es necesario (por defecto apunta a localhost:3000)
+npm install
+npm run dev
+```
+
+El frontend estara disponible en `http://localhost:4321`
+
+### Ejecucion Local Completa
+
+Para ejecutar el proyecto completo localmente:
+
+1. **Iniciar PostgreSQL** (asegurate de que este corriendo)
+
+2. **Terminal 1 - Backend**:
+
+```bash
+cd backend
+cargo run
+```
+
+3. **Terminal 2 - Frontend**:
+
+```bash
+cd frontend
+npm run dev
+```
+
+4. Abrir navegador en `http://localhost:4321`
 
 ## Documentacion
 
