@@ -6,9 +6,18 @@ Plataforma profesional B2B de catalogo para LabMedical, proveedor de productos m
 
 ```
 labmedical_web/
-├── backend/          # API Rust/Axum
-├── frontend/         # Aplicacion web Astro/TypeScript (proximamente)
-├── docs/            # Documentacion
+├── backend/          # API REST en Rust/Axum
+│   ├── src/          # Codigo fuente del servidor
+│   ├── migrations/   # Migraciones de base de datos
+│   └── .env.example  # Variables de entorno
+├── frontend/         # Aplicacion web Astro/TypeScript
+│   ├── src/          # Codigo fuente del frontend
+│   │   ├── components/  # Componentes reutilizables
+│   │   ├── layouts/     # Layouts base
+│   │   ├── pages/       # Paginas de la aplicacion
+│   │   └── lib/         # Cliente API y utilidades
+│   └── .env.example  # Variables de entorno
+├── docs/             # Documentacion del proyecto
 └── README.md
 ```
 
@@ -24,23 +33,22 @@ labmedical_web/
 - **Email**: API Resend
 - **Hosting**: Render.com
 
-### Frontend (Proximamente)
+### Frontend
 
 - **Framework**: Astro 4.x
 - **Lenguaje**: TypeScript
-- **Estilos**: TailwindCSS
+- **Estilos**: CSS vanilla
 - **Hosting**: Vercel
 
 ## Funcionalidades
 
 ### Funcionalidades Publicas
 
-- Catalogo de productos con busqueda y filtros
-- Paginas de detalle de productos
+- Pagina de inicio con informacion de la empresa
+- Catalogo de productos con busqueda y filtros por categoria
+- Paginas de detalle de productos con especificaciones
 - Navegacion por categorias
-- Sistema de solicitud de cotizaciones
-- Formulario de contacto
-- Paginas de informacion de la empresa
+- Formulario de solicitud de cotizaciones con validacion
 
 ### Funcionalidades Administrativas
 
@@ -128,8 +136,8 @@ npm run dev
 ## Documentacion
 
 - [Documentacion de API](./docs/API.md)
-- [Guia de Deployment](./docs/DEPLOYMENT.md)
-- [Configuracion de Desarrollo](./docs/SETUP.md)
+- [README Backend](./backend/README.md)
+- [README Frontend](./frontend/README.md)
 
 ## Acceso de Administrador por Defecto
 

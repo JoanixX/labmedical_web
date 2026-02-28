@@ -14,12 +14,33 @@ API Backend para la plataforma de catalogo medico B2B LabMedical, construida con
 ## Caracteristicas
 
 - API RESTful con endpoints publicos y administrativos
-- Autenticacion basada en JWT
-- Catalogo de productos con busqueda y filtrado
+- Autenticacion basada en JWT con bcrypt
+- Catalogo de productos con busqueda y filtrado por categoria
 - Sistema de solicitud de cotizaciones con notificaciones por email
-- Carga de imagenes a AWS S3
+- Carga de imagenes a AWS S3 con validacion de tipo y tamaño
 - Operaciones CRUD para productos, categorias y cotizaciones
-- Rate limiting y validacion de entrada
+- Validacion de entrada con el crate `validator`
+- Manejo centralizado de errores con codigos HTTP apropiados
+
+## Arquitectura
+
+```
+backend/src/
+├── main.rs          # punto de entrada, servidor y router
+├── config.rs        # carga de variables de entorno
+├── db.rs            # pool de conexiones a PostgreSQL
+├── error.rs         # manejo centralizado de errores
+├── models/          # structs de datos y DTOs
+├── routes/          # handlers de endpoints
+│   ├── public.rs    # endpoints publicos
+│   └── admin.rs     # endpoints de administracion
+├── services/        # logica de negocio
+│   ├── auth.rs      # JWT y hashing de contraseñas
+│   ├── email.rs     # notificaciones via Resend
+│   └── s3.rs        # carga de imagenes a AWS S3
+└── middleware/      # middleware de autenticacion
+    └── auth.rs      # verificacion de JWT
+```
 
 ## Comenzando
 
