@@ -40,7 +40,7 @@ async fn get_products(
         "SELECT * FROM products WHERE is_active = true"
     );
     
-    // Add category filter
+    // filtro por categoria
     if let Some(category_slug) = &params.category {
         query.push_str(&format!(
             " AND category_id = (SELECT id FROM categories WHERE slug = '{}')",
@@ -48,7 +48,7 @@ async fn get_products(
         ));
     }
     
-    // Add search filter
+    // filtro por busqueda
     if let Some(search) = &params.search {
         query.push_str(&format!(
             " AND (name ILIKE '%{}%' OR description ILIKE '%{}%')",
@@ -63,7 +63,7 @@ async fn get_products(
         .fetch_all(&state.db)
         .await?;
     
-    // Get total count
+    // obtener total de resultados
     let count_query = "SELECT COUNT(*) as count FROM products WHERE is_active = true";
     let total: (i64,) = sqlx::query_as(count_query)
         .fetch_one(&state.db)
@@ -87,7 +87,7 @@ async fn get_product_by_slug(
     .bind(&slug)
     .fetch_optional(&state.db)
     .await?
-    .ok_or_else(|| ApiError::NotFound("Product not found".to_string()))?;
+    .ok_or_else(|| ApiError::NotFound("Producto no encontrado".to_string()))?;
     
     Ok(Json(product))
 }
@@ -108,12 +108,12 @@ async fn create_quote(
     State(state): State<AppState>,
     Json(payload): Json<CreateQuoteRequest>,
 ) -> ApiResult<Json<serde_json::Value>> {
-    // Validate input
+    // validar entrada
     payload.validate()
         .map_err(|e| ApiError::Validation(e.to_string()))?;
     
-    // Insert quote into database
-    let quote = sqlx::query_as::<_, Quote>(
+    // insertar cotizacion en base de datos
+    let _quote = sqlx::query_as::<_, Quote>(
         r#"
         INSERT INTO quotes (
             company_name, company_tax_id, contact_name, email, phone,
@@ -134,7 +134,7 @@ async fn create_quote(
     .fetch_one(&state.db)
     .await?;
     
-    // Get product names for email
+    // obtener nombres de productos para email
     let product_names: Vec<String> = sqlx::query_as::<_, (String,)>(
         "SELECT name FROM products WHERE id = ANY($1)"
     )
@@ -147,7 +147,7 @@ async fn create_quote(
     
     let products_text = product_names.join(", ");
     
-    // Send email notification
+    // enviar notificacion por email
     state.email.send_quote_notification(
         &payload.company_name,
         &payload.contact_name,
@@ -159,6 +159,6 @@ async fn create_quote(
     
     Ok(Json(serde_json::json!({
         "success": true,
-        "message": "Quote request submitted successfully"
+        "message": "Solicitud de cotización enviada exitosamente"
     })))
 }

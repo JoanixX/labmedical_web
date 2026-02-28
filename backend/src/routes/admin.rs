@@ -1,6 +1,6 @@
 use axum::{
     extract::{Path, Query, State, Multipart},
-    routing::{get, post, put, delete, patch},
+    routing::{get, post, put, patch},
     Json, Router,
 };
 use serde::Deserialize;
@@ -9,7 +9,7 @@ use validator::Validate;
 use crate::{
     error::{ApiError, ApiResult},
     models::*,
-    services::{auth::{hash_password, verify_password, generate_jwt}, s3},
+    services::{auth::{verify_password, generate_jwt}, s3},
     AppState,
 };
 
@@ -25,8 +25,8 @@ pub fn routes() -> Router<AppState> {
         .route("/quotes/:id", get(get_quote_by_id))
         .route("/quotes/:id/status", patch(update_quote_status))
         .route("/upload", post(upload_image))
-        // Nota: El middleware de autenticación debe aplicarse en main.rs o handlers individuales
-        // Por ahora, los handlers verificarán la autenticación manualmente
+        // El middleware de autenticación debe aplicarse en main.rs o handlers individuales
+        // por el momento los handlers verificarán la autenticación manualmente
 }
 
 async fn login(

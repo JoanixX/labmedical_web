@@ -18,7 +18,7 @@ pub async fn upload_image(
     file_data: Vec<u8>,
     content_type: &str,
 ) -> ApiResult<String> {
-    // Generar nombre de archivo único
+    // generamos el nombre de archivo único
     let extension = match content_type {
         "image/jpeg" => "jpg",
         "image/png" => "png",
@@ -45,12 +45,13 @@ pub async fn upload_image(
     Ok(url)
 }
 
+#[allow(dead_code)]
 pub async fn delete_image(
     client: &Client,
     bucket: &str,
     url: &str,
 ) -> ApiResult<()> {
-    // Extraer key de la URL
+    // se extrae la key de la URL
     let key = url
         .split(&format!("{}.s3.amazonaws.com/", bucket))
         .nth(1)

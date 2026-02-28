@@ -29,6 +29,7 @@ pub struct CreateProductRequest {
 }
 
 #[derive(Debug, Deserialize)]
+#[allow(dead_code)]
 pub struct UpdateProductRequest {
     pub name: Option<String>,
     pub slug: Option<String>,

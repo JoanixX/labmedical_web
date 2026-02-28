@@ -1,11 +1,11 @@
 use axum::{
     extract::{Request, State},
-    http::StatusCode,
     middleware::Next,
     response::Response,
 };
 use crate::{error::ApiError, services::auth::verify_jwt, AppState};
 
+#[allow(dead_code)]
 pub async fn auth_middleware(
     State(state): State<AppState>,
     mut request: Request,
@@ -23,8 +23,7 @@ pub async fn auth_middleware(
     
     let claims = verify_jwt(token, &state.config.jwt_secret)?;
     
-    // Agregar claims a las extensiones del request para uso en handlers
+    // se agregaron claims a las extensiones del request para uso en handlers
     request.extensions_mut().insert(claims);
-    
     Ok(next.run(request).await)
 }
