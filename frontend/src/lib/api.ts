@@ -8,6 +8,12 @@ export interface Product {
   slug: string;
   description: string;
   category_id: number;
+  brand: string;
+  model_number: string | null;
+  origin_country: string;
+  warranty_period: number;
+  technical_sheet_url: string | null;
+  registro_sanitario: string;
   specifications: Record<string, any>;
   image_url: string | null;
   additional_images: string[];
@@ -32,6 +38,11 @@ export interface ProductsResponse {
   limit: number;
 }
 
+export interface ApiErrorResponse {
+  code: string;
+  message: string;
+}
+
 export async function getProducts(params?: {
   category?: string;
   search?: string;
@@ -48,7 +59,7 @@ export async function getProducts(params?: {
   const response = await fetch(url);
   
   if (!response.ok) {
-    throw new Error('error al cargar productos');
+    throw new Error('Error al cargar productos');
   }
   
   return response.json();
@@ -58,7 +69,7 @@ export async function getProductBySlug(slug: string): Promise<Product> {
   const response = await fetch(`${API_URL}/api/products/${slug}`);
   
   if (!response.ok) {
-    throw new Error('producto no encontrado');
+    throw new Error('Producto no encontrado');
   }
   
   return response.json();
@@ -68,7 +79,7 @@ export async function getCategories(): Promise<Category[]> {
   const response = await fetch(`${API_URL}/api/categories`);
   
   if (!response.ok) {
-    throw new Error('error al cargar categorias');
+    throw new Error('Error al cargar categorias');
   }
   
   return response.json();
@@ -83,7 +94,7 @@ export async function submitQuote(data: {
   product_ids: number[];
   estimated_quantity: string;
   message?: string;
-}): Promise<{ success: boolean; message: string }> {
+}): Promise<{ code: string; message: string }> {
   const response = await fetch(`${API_URL}/api/quotes`, {
     method: 'POST',
     headers: {
@@ -92,9 +103,12 @@ export async function submitQuote(data: {
     body: JSON.stringify(data),
   });
   
+  const result = await response.json();
+  
   if (!response.ok) {
-    throw new Error('error al enviar cotizacion');
+    const err = result as ApiErrorResponse;
+    throw new Error(err.message || 'Error al enviar cotizacion');
   }
   
-  return response.json();
+  return result;
 }
