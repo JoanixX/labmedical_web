@@ -7,7 +7,7 @@ use chrono::{DateTime, Utc};
 pub struct Quote {
     pub id: i32,
     pub company_name: String,
-    pub company_tax_id: Option<String>,
+    pub company_tax_id: String,
     pub contact_name: String,
     pub email: String,
     pub phone: Option<String>,
@@ -25,8 +25,9 @@ pub struct CreateQuoteRequest {
     #[validate(length(min = 2, max = 255))]
     pub company_name: String,
     
-    #[validate(length(max = 50))]
-    pub company_tax_id: Option<String>,
+    // Para este ruc peruano se valida con algoritmo modulo 11
+    #[validate(length(equal = 11))]
+    pub company_tax_id: String,
     
     #[validate(length(min = 2, max = 255))]
     pub contact_name: String,
