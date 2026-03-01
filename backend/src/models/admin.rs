@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use validator::Validate;
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Admin {
@@ -10,8 +10,8 @@ pub struct Admin {
     #[serde(skip_serializing)]
     pub password_hash: String,
     pub name: Option<String>,
-    pub created_at: DateTime<Utc>,
-    pub last_login: Option<DateTime<Utc>>,
+    pub created_at: NaiveDateTime,
+    pub last_login: Option<NaiveDateTime>,
 }
 
 #[derive(Debug, Deserialize, Validate)]

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use sqlx::FromRow;
 use validator::Validate;
-use chrono::{DateTime, Utc};
+use chrono::NaiveDateTime;
 
 #[derive(Debug, Serialize, Deserialize, FromRow)]
 pub struct Quote {
@@ -15,8 +15,8 @@ pub struct Quote {
     pub estimated_quantity: Option<String>,
     pub message: Option<String>,
     pub status: String,
-    pub created_at: DateTime<Utc>,
-    pub contacted_at: Option<DateTime<Utc>>,
+    pub created_at: NaiveDateTime,
+    pub contacted_at: Option<NaiveDateTime>,
     pub notes: Option<String>,
 }
 
