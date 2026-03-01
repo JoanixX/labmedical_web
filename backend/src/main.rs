@@ -1,5 +1,5 @@
-use axum::{Router, routing::get};
-use tower_http::cors::{CorsLayer, Any};
+use axum::{Router, routing::get, http};
+use tower_http::cors::{CorsLayer, AllowOrigin};
 use std::net::SocketAddr;
 use sqlx::PgPool;
 use aws_sdk_s3::Client as S3Client;
@@ -25,7 +25,7 @@ pub struct AppState {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    // Inicializar tracing
+    // inicializar tracing con formato estructurado
     tracing_subscriber::fmt()
         .with_env_filter(
             tracing_subscriber::EnvFilter::from_default_env()
@@ -33,15 +33,15 @@ async fn main() -> anyhow::Result<()> {
         )
         .init();
 
-    tracing::info!("Iniciando servidor API LabMedical...");
+    tracing::info!("Iniciando servidor API LabMedical v0.2.0");
 
-    // Cargar configuración
+    // cargar configuracion
     let config = Config::from_env()
-        .map_err(|e| anyhow::anyhow!("Error al cargar configuración: {}", e))?;
+        .map_err(|e| anyhow::anyhow!("Error al cargar configuracion: {}", e))?;
     
-    tracing::info!("Configuración cargada exitosamente");
+    tracing::info!("Configuracion cargada exitosamente");
     
-    // Inicializar pool de base de datos
+    // inicializar pool de base de datos
     let db_pool = db::create_pool(&config.database_url).await?;
     tracing::info!("Pool de conexiones de base de datos creado");
     
@@ -52,7 +52,7 @@ async fn main() -> anyhow::Result<()> {
         .await?;
     tracing::info!("Migraciones de base de datos completadas");
     
-    // Inicializar servicios
+    // inicializar servicios
     let s3_client = services::s3::create_client(&config).await;
     tracing::info!("Cliente S3 inicializado");
     
@@ -63,7 +63,6 @@ async fn main() -> anyhow::Result<()> {
     let port = config.port;
     let cors_origins = config.cors_origin.clone();
     
-    // Construir estado de la aplicación
     let app_state = AppState {
         db: db_pool,
         s3: s3_client,
@@ -71,18 +70,28 @@ async fn main() -> anyhow::Result<()> {
         config,
     };
     
-    // Configurar CORS
+    // configurar cors estricto - sin AllowAll
     let cors = CorsLayer::new()
-        .allow_origin(
+        .allow_origin(AllowOrigin::list(
             cors_origins
                 .iter()
                 .map(|origin| origin.parse().unwrap())
                 .collect::<Vec<_>>()
-        )
-        .allow_methods(Any)
-        .allow_headers(Any);
+        ))
+        .allow_methods([
+            http::Method::GET,
+            http::Method::POST,
+            http::Method::PUT,
+            http::Method::PATCH,
+            http::Method::DELETE,
+        ])
+        .allow_headers([
+            http::header::CONTENT_TYPE,
+            http::header::AUTHORIZATION,
+            http::header::ACCEPT,
+        ]);
     
-    // Construir router
+    // construir router
     let app = Router::new()
         .route("/health", get(health_check))
         .nest("/api", routes::public::routes())
