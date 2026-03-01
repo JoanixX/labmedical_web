@@ -1,16 +1,16 @@
--- Enable UUID extension
+-- habilitar extension uuid
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- Categories table
+-- tabla de categorias
 CREATE TABLE categories (
     id SERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
     slug VARCHAR(100) UNIQUE NOT NULL,
     description TEXT,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Products table
+-- tabla de productos
 CREATE TABLE products (
     id SERIAL PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
@@ -22,11 +22,11 @@ CREATE TABLE products (
     additional_images JSONB DEFAULT '[]',
     regulatory_info JSONB DEFAULT '{}',
     is_active BOOLEAN DEFAULT true,
-    created_at TIMESTAMP DEFAULT NOW(),
-    updated_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- Quotes table
+-- tabla de cotizaciones
 CREATE TABLE quotes (
     id SERIAL PRIMARY KEY,
     company_name VARCHAR(255) NOT NULL,
@@ -38,44 +38,44 @@ CREATE TABLE quotes (
     estimated_quantity TEXT,
     message TEXT,
     status VARCHAR(50) DEFAULT 'pending',
-    created_at TIMESTAMP DEFAULT NOW(),
-    contacted_at TIMESTAMP,
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    contacted_at TIMESTAMPTZ,
     notes TEXT
 );
 
--- Admins table
+-- tabla de administradores
 CREATE TABLE admins (
     id SERIAL PRIMARY KEY,
     email VARCHAR(255) UNIQUE NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     name VARCHAR(255),
-    created_at TIMESTAMP DEFAULT NOW(),
-    last_login TIMESTAMP
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    last_login TIMESTAMPTZ
 );
 
--- Indexes for performance
+-- indices de rendimiento
 CREATE INDEX idx_products_category ON products(category_id);
 CREATE INDEX idx_products_active ON products(is_active);
 CREATE INDEX idx_products_slug ON products(slug);
 CREATE INDEX idx_quotes_status ON quotes(status);
 CREATE INDEX idx_quotes_created ON quotes(created_at DESC);
 
--- Full-text search index for products (Spanish language)
+-- indice de busqueda de texto completo
 CREATE INDEX idx_products_search ON products 
 USING gin(to_tsvector('spanish', name || ' ' || COALESCE(description, '')));
 
--- Insert default admin user (password: admin123)
--- Password hash for 'admin123' using bcrypt
+-- usuario admin por defecto (contrasena: admin123)
 INSERT INTO admins (email, password_hash, name) 
 VALUES (
     'admin@labmedical.com', 
     '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYzpLaEg7Pu',
-    'Administrator'
+    'Administrador'
 );
 
--- Insert sample categories
+-- categorias de ejemplo
 INSERT INTO categories (name, slug, description) VALUES
-('Equipos Médicos', 'equipos-medicos', 'Equipos y dispositivos médicos profesionales'),
-('Instrumental Quirúrgico', 'instrumental-quirurgico', 'Instrumentos para procedimientos quirúrgicos'),
-('Consumibles', 'consumibles', 'Productos de uso médico desechables'),
-('Mobiliario Clínico', 'mobiliario-clinico', 'Mobiliario y equipamiento para clínicas y hospitales');
+('Equipos Medicos', 'equipos-medicos', 'Equipos y dispositivos medicos profesionales'),
+('Instrumental Quirurgico', 'instrumental-quirurgico', 'Instrumentos para procedimientos quirurgicos'),
+('Consumibles', 'consumibles', 'Productos de uso medico desechables'),
+('Mobiliario Clinico', 'mobiliario-clinico', 'Mobiliario y equipamiento para clinicas y hospitales');
+
