@@ -9,6 +9,7 @@ use validator::Validate;
 use crate::{
     error::{ApiError, ApiResult},
     models::*,
+    services::validation::{validate_ruc, sanitize_text},
     AppState,
 };
 
@@ -42,17 +43,19 @@ async fn get_products(
     
     // filtro por categoria
     if let Some(category_slug) = &params.category {
+        let clean = sanitize_text(category_slug);
         query.push_str(&format!(
             " AND category_id = (SELECT id FROM categories WHERE slug = '{}')",
-            category_slug
+            clean
         ));
     }
     
     // filtro por busqueda
     if let Some(search) = &params.search {
+        let clean = sanitize_text(search);
         query.push_str(&format!(
             " AND (name ILIKE '%{}%' OR description ILIKE '%{}%')",
-            search, search
+            clean, clean
         ));
     }
     
@@ -108,11 +111,22 @@ async fn create_quote(
     State(state): State<AppState>,
     Json(payload): Json<CreateQuoteRequest>,
 ) -> ApiResult<Json<serde_json::Value>> {
-    // validar entrada
+    // validar estructura basica
     payload.validate()
         .map_err(|e| ApiError::Validation(e.to_string()))?;
     
-    // insertar cotizacion en base de datos
+    // validar ruc peruano con algoritmo modulo 11
+    if !validate_ruc(&payload.company_tax_id) {
+        return Err(ApiError::InvalidRuc);
+    }
+    
+    // Sanitizar campos de texto
+    let company_name = sanitize_text(&payload.company_name);
+    let contact_name = sanitize_text(&payload.contact_name);
+    let message = payload.message.as_deref().map(sanitize_text);
+    let estimated_quantity = payload.estimated_quantity.as_deref().map(sanitize_text);
+    
+    // Insertar cotizacion en base de datos
     let _quote = sqlx::query_as::<_, Quote>(
         r#"
         INSERT INTO quotes (
@@ -123,14 +137,14 @@ async fn create_quote(
         RETURNING *
         "#
     )
-    .bind(&payload.company_name)
+    .bind(&company_name)
     .bind(&payload.company_tax_id)
-    .bind(&payload.contact_name)
+    .bind(&contact_name)
     .bind(&payload.email)
     .bind(&payload.phone)
     .bind(&payload.product_ids)
-    .bind(&payload.estimated_quantity)
-    .bind(&payload.message)
+    .bind(&estimated_quantity)
+    .bind(&message)
     .fetch_one(&state.db)
     .await?;
     
@@ -149,16 +163,17 @@ async fn create_quote(
     
     // enviar notificacion por email
     state.email.send_quote_notification(
-        &payload.company_name,
-        &payload.contact_name,
+        &company_name,
+        &contact_name,
         &payload.email,
         payload.phone.as_deref(),
+        &payload.company_tax_id,
         &products_text,
-        payload.message.as_deref(),
+        message.as_deref(),
     ).await?;
     
     Ok(Json(serde_json::json!({
-        "success": true,
-        "message": "Solicitud de cotización enviada exitosamente"
+        "code": "OK",
+        "message": "Solicitud de cotizacion enviada exitosamente"
     })))
 }
