@@ -7,11 +7,34 @@
 
 ## Autenticacion
 
-Los endpoints administrativos requieren autenticacion JWT. Incluir el token en el header de Autorizacion:
+Los endpoints administrativos requieren autenticacion JWT (expiracion: 2 horas). Incluir el token en el header:
 
 ```
 Authorization: Bearer <tu_token_jwt>
 ```
+
+## Formato de Errores
+
+Todos los errores siguen un formato estandarizado con codigos opacos:
+
+```json
+{
+  "code": "ERR_VALIDATION",
+  "message": "Error de validacion: ..."
+}
+```
+
+| Codigo                | HTTP | Descripcion                                     |
+| --------------------- | ---- | ----------------------------------------------- |
+| `ERR_INTERNAL_SERVER` | 500  | Error interno (detalles logueados internamente) |
+| `ERR_UNAUTHORIZED`    | 401  | Credenciales invalidas o token expirado         |
+| `ERR_VALIDATION`      | 400  | Error de validacion en los datos                |
+| `ERR_NOT_FOUND`       | 404  | Recurso no encontrado                           |
+| `ERR_BAD_REQUEST`     | 400  | Solicitud malformada                            |
+| `ERR_RATE_LIMIT`      | 429  | Demasiadas solicitudes                          |
+| `ERR_INVALID_RUC`     | 400  | RUC peruano invalido (algoritmo Modulo 11)      |
+
+---
 
 ## Endpoints Publicos
 
@@ -49,10 +72,16 @@ GET /api/products
   "products": [
     {
       "id": 1,
-      "name": "Nombre del Producto",
-      "slug": "nombre-del-producto",
-      "description": "Descripcion del producto",
+      "name": "Monitor de Signos Vitales",
+      "slug": "monitor-signos-vitales",
+      "description": "Monitor multiparametro profesional",
       "category_id": 1,
+      "brand": "Mindray",
+      "model_number": "BeneVision N1",
+      "origin_country": "China",
+      "warranty_period": 24,
+      "technical_sheet_url": "https://...",
+      "registro_sanitario": "DM-12345",
       "specifications": {},
       "image_url": "https://...",
       "additional_images": [],
@@ -76,16 +105,7 @@ GET /api/products
 GET /api/products/:slug
 ```
 
-**Respuesta:**
-
-```json
-{
-  "id": 1,
-  "name": "Nombre del Producto",
-  "slug": "nombre-del-producto",
-  ...
-}
-```
+**Respuesta:** Mismo formato que un producto individual del listado.
 
 ---
 
@@ -101,9 +121,9 @@ GET /api/categories
 [
   {
     "id": 1,
-    "name": "Nombre de Categoria",
-    "slug": "slug-categoria",
-    "description": "Descripcion de la categoria",
+    "name": "Equipos Medicos",
+    "slug": "equipos-medicos",
+    "description": "Equipos y dispositivos medicos profesionales",
     "created_at": "2024-01-01T00:00:00Z"
   }
 ]
@@ -121,32 +141,46 @@ POST /api/quotes
 
 ```json
 {
-  "company_name": "Nombre de Empresa",
-  "company_tax_id": "12345678",
+  "company_name": "Clinica San Pablo",
+  "company_tax_id": "20100047218",
   "contact_name": "Juan Perez",
-  "email": "juan@empresa.com",
+  "email": "juan@clinicasanpablo.com",
   "phone": "+51987654321",
   "product_ids": [1, 2, 3],
   "estimated_quantity": "100 unidades",
-  "message": "Informacion adicional"
+  "message": "Necesitamos cotizacion urgente"
 }
 ```
 
 **Reglas de Validacion:**
 
-- `company_name`: 2-255 caracteres
-- `contact_name`: 2-255 caracteres
-- `email`: Formato de email valido
-- `product_ids`: Al menos 1 producto
-- `estimated_quantity`: Max 1000 caracteres
-- `message`: Max 2000 caracteres
+- `company_name`: 2-255 caracteres (obligatorio)
+- `company_tax_id`: RUC peruano de 11 digitos (obligatorio, validado con algoritmo Modulo 11)
+  - Prefijos validos: 10 (persona natural), 15 (entidad publica), 17 (entidad con fin social), 20 (persona juridica)
+- `contact_name`: 2-255 caracteres (obligatorio)
+- `email`: Formato RFC 5322 (obligatorio)
+- `phone`: Max 50 caracteres (opcional)
+- `product_ids`: Al menos 1 producto (obligatorio)
+- `estimated_quantity`: Max 1000 caracteres (opcional)
+- `message`: Max 2000 caracteres (opcional)
 
-**Respuesta:**
+> Todos los campos de texto se sanitizan automaticamente para prevenir XSS.
+
+**Respuesta exitosa:**
 
 ```json
 {
-  "success": true,
+  "code": "OK",
   "message": "Solicitud de cotizacion enviada exitosamente"
+}
+```
+
+**Error de RUC invalido:**
+
+```json
+{
+  "code": "ERR_INVALID_RUC",
+  "message": "El RUC proporcionado no es valido"
 }
 ```
 
@@ -181,6 +215,8 @@ POST /api/admin/login
   }
 }
 ```
+
+> El token JWT expira en 2 horas. Contraseñas hasheadas con Argon2id.
 
 ---
 
@@ -221,20 +257,28 @@ Content-Type: application/json
 
 ```json
 {
-  "name": "Nuevo Producto",
-  "slug": "nuevo-producto",
-  "description": "Descripcion del producto",
+  "name": "Monitor de Signos Vitales",
+  "slug": "monitor-signos-vitales",
+  "description": "Monitor multiparametro profesional",
   "category_id": 1,
+  "brand": "Mindray",
+  "model_number": "BeneVision N1",
+  "origin_country": "China",
+  "warranty_period": 24,
+  "technical_sheet_url": "https://ejemplo.com/ficha.pdf",
+  "registro_sanitario": "DM-12345",
   "specifications": {
-    "peso": "1kg",
-    "dimensiones": "10x10x10cm"
+    "peso": "1.5kg",
+    "pantalla": "10 pulgadas"
   },
   "regulatory_info": {
     "certificacion": "CE",
-    "registro": "REG-12345"
+    "clase": "IIa"
   }
 }
 ```
+
+**Campos obligatorios:** `name`, `slug`, `brand`, `origin_country`, `registro_sanitario`
 
 ---
 
@@ -244,19 +288,13 @@ Content-Type: application/json
 PUT /api/admin/products/:id
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-Content-Type: application/json
-```
-
 **Cuerpo de la Solicitud:** (todos los campos opcionales)
 
 ```json
 {
   "name": "Nombre Actualizado",
-  "description": "Descripcion actualizada",
+  "brand": "Nueva Marca",
+  "warranty_period": 36,
   "is_active": false
 }
 ```
@@ -269,12 +307,6 @@ Content-Type: application/json
 DELETE /api/admin/products/:id
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
 ---
 
 ### Alternar Estado Activo del Producto
@@ -283,15 +315,9 @@ Authorization: Bearer <token>
 PATCH /api/admin/products/:id/toggle
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
 ---
 
-### Subir Imagen
+### Subir Archivo
 
 ```http
 POST /api/admin/upload
@@ -306,13 +332,24 @@ Content-Type: multipart/form-data
 
 **Cuerpo de la Solicitud:**
 
-- `file`: Archivo de imagen (JPG, PNG, WebP, max 5MB)
+- `file`: Archivo permitido (max 10MB)
+
+**Tipos permitidos:**
+
+| Tipo              | Extension | Uso                  |
+| ----------------- | --------- | -------------------- |
+| `image/jpeg`      | .jpg      | Imagenes de producto |
+| `image/webp`      | .webp     | Imagenes de producto |
+| `application/pdf` | .pdf      | Fichas tecnicas      |
+
+> Los nombres de archivo se generan como UUID en el servidor para evitar colisiones y ataques de enumeracion.
 
 **Respuesta:**
 
 ```json
 {
-  "url": "https://bucket.s3.amazonaws.com/products/uuid.jpg"
+  "code": "OK",
+  "url": "https://bucket.s3.amazonaws.com/products/images/uuid.jpg"
 }
 ```
 
@@ -322,12 +359,6 @@ Content-Type: multipart/form-data
 
 ```http
 GET /api/admin/quotes
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <token>
 ```
 
 **Parametros de Consulta:**
@@ -344,25 +375,12 @@ Authorization: Bearer <token>
 GET /api/admin/quotes/:id
 ```
 
-**Headers:**
-
-```
-Authorization: Bearer <token>
-```
-
 ---
 
 ### Actualizar Estado de Cotizacion
 
 ```http
 PATCH /api/admin/quotes/:id/status
-```
-
-**Headers:**
-
-```
-Authorization: Bearer <token>
-Content-Type: application/json
 ```
 
 **Cuerpo de la Solicitud:**
@@ -376,32 +394,13 @@ Content-Type: application/json
 
 ---
 
-## Respuestas de Error
+## Notificaciones por Email
 
-Todos los endpoints pueden devolver respuestas de error en este formato:
+Cuando se crea una cotizacion, se envia un email HTML profesional al equipo de ventas que incluye:
 
-```json
-{
-  "error": "Descripcion del mensaje de error"
-}
-```
+- Razon social y RUC de la empresa
+- Datos de contacto (nombre, email, telefono)
+- Lista de productos solicitados
+- Mensaje adicional del cliente
 
-**Codigos de Estado HTTP Comunes:**
-
-- `200 OK`: Exito
-- `400 Bad Request`: Entrada invalida
-- `401 Unauthorized`: Autenticacion faltante o invalida
-- `404 Not Found`: Recurso no encontrado
-- `429 Too Many Requests`: Limite de tasa excedido
-- `500 Internal Server Error`: Error del servidor
-
----
-
-## Limitacion de Tasa
-
-Los endpoints publicos tienen limitacion de tasa para prevenir abuso:
-
-- Envios de cotizaciones: 5 solicitudes por hora por IP
-- Otros endpoints publicos: 100 solicitudes por minuto por IP
-
-Los endpoints administrativos no tienen limitacion de tasa pero requieren autenticacion.
+Los correos se envian a traves de la API de Resend.

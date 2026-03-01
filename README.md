@@ -17,6 +17,7 @@ labmedical_web/
 │   │   ├── pages/       # Paginas de la aplicacion
 │   │   └── lib/         # Cliente API y utilidades
 │   └── .env.example  # Variables de entorno
+├── scripts/          # Utilidades (no se suben al repo)
 ├── docs/             # Documentacion del proyecto
 └── README.md
 ```
@@ -27,9 +28,9 @@ labmedical_web/
 
 - **Lenguaje**: Rust
 - **Framework**: Axum 0.7
-- **Base de Datos**: PostgreSQL
-- **Autenticacion**: JWT + bcrypt
-- **Almacenamiento**: AWS S3
+- **Base de Datos**: PostgreSQL (Neon.tech - free tier)
+- **Autenticacion**: JWT + Argon2id
+- **Almacenamiento**: Cloudflare R2 (compatible con S3)
 - **Email**: API Resend
 - **Hosting**: Render.com
 
@@ -46,17 +47,18 @@ labmedical_web/
 
 - Pagina de inicio con informacion de la empresa
 - Catalogo de productos con busqueda y filtros por categoria
-- Paginas de detalle de productos con especificaciones
+- Paginas de detalle de productos con especificaciones tecnicas
+- Ficha tecnica y registro sanitario por producto
 - Navegacion por categorias
-- Formulario de solicitud de cotizaciones con validacion
+- Formulario de solicitud de cotizaciones con validacion de RUC peruano
 
 ### Funcionalidades Administrativas
 
-- Autenticacion segura
-- Gestion de productos (CRUD)
+- Autenticacion segura con Argon2id
+- Gestion de productos (CRUD) con campos regulatorios
 - Gestion de categorias
 - Bandeja de entrada y gestion de cotizaciones
-- Carga de imagenes a S3
+- Carga de archivos (imagenes JPEG/WebP y PDFs) a S3
 - Panel de control con metricas
 
 ## Modelo de Negocio
@@ -74,9 +76,9 @@ Esta es una **plataforma B2B**, no un sitio de comercio electronico:
 
 - Rust 1.70+ (para backend)
 - Node.js 18+ (para frontend)
-- PostgreSQL 14+
-- Cuenta AWS S3
-- Cuenta Resend para emails
+- Cuenta en Neon.tech (PostgreSQL gratuito en la nube)
+- Cuenta en Cloudflare R2 o AWS S3 (almacenamiento)
+- Cuenta en Resend (emails)
 
 ### Configuracion del Backend
 
@@ -87,10 +89,9 @@ Inicio rapido:
 ```bash
 cd backend
 cp .env.example .env
-# editar .env con tus credenciales
-cargo install sqlx-cli
-sqlx migrate run
+# Editar .env con tu connection string de Neon.tech
 cargo run
+# Las migraciones se ejecutan automaticamente
 ```
 
 El backend estara disponible en `http://localhost:3000`
@@ -104,7 +105,6 @@ Inicio rapido:
 ```bash
 cd frontend
 cp .env.example .env
-# editar .env si es necesario (por defecto apunta a localhost:3000)
 npm install
 npm run dev
 ```
@@ -115,23 +115,23 @@ El frontend estara disponible en `http://localhost:4321`
 
 Para ejecutar el proyecto completo localmente:
 
-1. **Iniciar PostgreSQL** (asegurate de que este corriendo)
-
-2. **Terminal 1 - Backend**:
+1. **Terminal 1 - Backend**:
 
 ```bash
 cd backend
 cargo run
 ```
 
-3. **Terminal 2 - Frontend**:
+2. **Terminal 2 - Frontend**:
 
 ```bash
 cd frontend
 npm run dev
 ```
 
-4. Abrir navegador en `http://localhost:4321`
+3. Abrir navegador en `http://localhost:4321`
+
+> No es necesario instalar PostgreSQL localmente, se usa Neon.tech en la nube.
 
 ## Documentacion
 
@@ -144,38 +144,37 @@ npm run dev
 - Email: `admin@labmedical.com`
 - Contraseña: `admin123`
 
-**⚠️ Cambiar inmediatamente en produccion**
+**⚠️ Cambiar inmediatamente en produccion usando `scripts/generate_secrets.py`**
 
 ## Deployment
 
 ### Backend (Render.com)
 
-- Tier gratuito con PostgreSQL incluido
+- Tier gratuito permanente
 - Deployment automatico desde GitHub
 - Ver `backend/render.yaml` para configuracion
 
 ### Frontend (Vercel)
 
-- Tier gratuito con CDN global
+- Tier gratuito permanente con CDN global
 - Deployment automatico desde GitHub
-- Configuracion proximamente
 
-## Caracteristicas de Seguridad
+## Seguridad
 
-- Autenticacion JWT con expiracion de 24h
-- Hashing de contraseñas con bcrypt
-- Validacion de entrada (cliente + servidor)
-- Rate limiting en endpoints publicos
-- Proteccion contra inyeccion SQL
-- Configuracion CORS
-- Validacion de carga de archivos
+- **Autenticacion**: JWT con expiracion de 2 horas
+- **Hashing**: Argon2id (resistente a GPU y side-channel attacks)
+- **Validacion**: RUC peruano (algoritmo Modulo 11), sanitizacion XSS con ammonia
+- **CORS**: Metodos y headers explicitos, sin AllowAll
+- **Archivos**: Solo JPEG, WebP y PDF permitidos, nombres UUID generados en servidor
+- **Errores opacos**: Nunca se exponen detalles de base de datos al cliente
+- **Codigos de error**: Estandarizados (ERR_INVALID_RUC, ERR_UNAUTHORIZED, etc.)
 
 ## Esquema de Base de Datos
 
-- **products**: Catalogo de productos con especificaciones JSONB
+- **products**: Catalogo con marca, modelo, registro sanitario, ficha tecnica, garantia
 - **categories**: Categorizacion de productos
-- **quotes**: Solicitudes de cotizacion de clientes
-- **admins**: Usuarios administradores con contraseñas hasheadas
+- **quotes**: Solicitudes de cotizacion con RUC obligatorio
+- **admins**: Usuarios administradores con contraseñas Argon2id
 
 ## Endpoints de API
 
@@ -184,13 +183,13 @@ npm run dev
 - `GET /api/products` - Listar productos
 - `GET /api/products/:slug` - Detalles de producto
 - `GET /api/categories` - Listar categorias
-- `POST /api/quotes` - Enviar solicitud de cotizacion
+- `POST /api/quotes` - Enviar solicitud de cotizacion (requiere RUC valido)
 
 ### Administrador (requiere JWT)
 
 - `POST /api/admin/login` - Autenticacion
 - CRUD completo para productos, categorias y cotizaciones
-- `POST /api/admin/upload` - Carga de imagenes
+- `POST /api/admin/upload` - Carga de archivos (JPEG, WebP, PDF)
 
 ## Licencia
 
