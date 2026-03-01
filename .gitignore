@@ -1,6 +1,8 @@
 # Backend (Rust)
 backend/target/
 backend/.env
+backend/.env.production
+backend/.env.local
 backend/Cargo.lock
 
 # Frontend (Node)
@@ -11,6 +13,12 @@ frontend/.env.local
 frontend/.env.production
 frontend/.env.development
 frontend/.astro/
+
+# Scripts de seguridad (NO subir al repo)
+scripts/generate_secrets.py
+scripts/*.key
+scripts/*.pem
+scripts/*.secret
 
 # IDEs
 .vscode/
@@ -25,13 +33,13 @@ Thumbs.db
 # Logs
 *.log
 
-# Environment files (except examples)
+# Archivos de entorno genericos
 .env
 .env.local
 .env.*.local
 .env.production
 .env.development
 
-# Allow example env files
+# Permitir archivos example
 !.env.example
 !**/.env.example
