@@ -1,0 +1,116 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Términos y Condiciones - LabMedical" description="Términos y condiciones de venta de equipos médicos de LabMedical.">
+  <div class="legal-page">
+    <div class="container">
+      <h1>Términos y Condiciones</h1>
+      <p class="last-updated">Última actualización: Marzo 2026</p>
+
+      <div class="legal-content">
+        <section>
+          <h2>1. Generalidades</h2>
+          <p>Los presentes términos y condiciones regulan la relación comercial entre LabMedical (en adelante "la empresa") y sus clientes (en adelante "el cliente") en el contexto de la venta de equipos y suministros médicos.</p>
+          <p>Al solicitar una cotización o realizar una compra, el cliente acepta estos términos en su totalidad.</p>
+        </section>
+
+        <section>
+          <h2>2. Cotizaciones</h2>
+          <p>Las cotizaciones emitidas por LabMedical tienen una validez de 30 dias calendario a partir de su emision, salvo indicacion contraria en el documento.</p>
+          <p>Los precios están expresados en soles peruanos (PEN) e incluyen IGV, salvo indicacion expresa.</p>
+          <p>Las cotizaciones no constituyen un compromiso de venta hasta la emision de la orden de compra correspondiente.</p>
+        </section>
+
+        <section>
+          <h2>3. Ordenes de Compra</h2>
+          <p>Las ordenes de compra deben ser emitidas por un representante autorizado del cliente con los siguientes datos minimos:</p>
+          <ul>
+            <li>Razón social y RUC del cliente</li>
+            <li>Descripción del producto solicitado</li>
+            <li>Cantidad y precio unitario acordado</li>
+            <li>Dirección de entrega</li>
+            <li>Condiciones de pago acordadas</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>4. Garantía</h2>
+          <p>Todos los equipos médicos cuentan con garantía del fabricante según se indica en la ficha técnica de cada producto. El periodo de garantía inicia a partir de la fecha de entrega.</p>
+          <p>La garantía no cubre daños causados por mal uso, manipulación inadecuada, modificaciones no autorizadas, variaciones de voltaje o desastres naturales.</p>
+        </section>
+
+        <section>
+          <h2>5. Entrega</h2>
+          <p>Los plazos de entrega son estimados y se comunican al momento de confirmar la orden de compra. LabMedical no sera responsable por retrasos causados por fuerza mayor, aduanas o terceros.</p>
+        </section>
+
+        <section>
+          <h2>6. Condiciones de Pago</h2>
+          <p>Las condiciones de pago se acuerdan individualmente con cada cliente y se detallan en la cotización o contrato correspondiente.</p>
+          <p>LabMedical emite facturas electrónicas conforme a la normativa de SUNAT.</p>
+        </section>
+
+        <section>
+          <h2>7. Registro Sanitario</h2>
+          <p>Todos los equipos médicos comercializados por LabMedical cuentan con registro sanitario vigente emitido por DIGEMID (Direccion General de Medicamentos, Insumos y Drogas).</p>
+        </section>
+
+        <section>
+          <h2>8. Jurisdicción</h2>
+          <p>Cualquier controversia derivada de la relación comercial se someterá a la jurisdicción de los tribunales de Lima, Perú.</p>
+        </section>
+      </div>
+    </div>
+  </div>
+</Layout>
+
+<style>
+  .legal-page {
+    padding: 2.5rem 0;
+  }
+
+  .container {
+    max-width: 800px;
+  }
+
+  h1 {
+    font-size: 2rem;
+    color: var(--gris-texto);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .last-updated {
+    color: var(--gris-secundario);
+    font-size: 0.875rem;
+    margin-bottom: 2rem;
+  }
+
+  .legal-content section {
+    margin-bottom: 2rem;
+  }
+
+  .legal-content h2 {
+    font-size: 1.125rem;
+    color: var(--gris-texto);
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .legal-content p {
+    color: var(--gris-pizarra);
+    margin-bottom: 0.75rem;
+    line-height: 1.7;
+  }
+
+  .legal-content ul {
+    color: var(--gris-pizarra);
+    margin: 0.5rem 0 0.75rem 1.5rem;
+    line-height: 1.7;
+  }
+
+  .legal-content li {
+    margin-bottom: 0.25rem;
+  }
+</style>
