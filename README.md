@@ -36,9 +36,11 @@ labmedical_web/
 
 ### Frontend
 
-- **Framework**: Astro 4.x
+- **Framework**: Astro 4.x (Static Site Generation)
 - **Lenguaje**: TypeScript
-- **Estilos**: CSS vanilla
+- **Estado**: Nano Stores (carrito de cotizacion persistente)
+- **Estilos**: CSS vanilla con variables CSS
+- **Tipografia**: Inter (Google Fonts)
 - **Hosting**: Vercel
 
 ## Funcionalidades

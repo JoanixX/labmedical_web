@@ -1,96 +1,89 @@
 # Frontend LabMedical
 
-Frontend de la plataforma de catalogo medico B2B, construido con Astro y TypeScript.
+Frontend para la plataforma de catalogo medico B2B LabMedical, construido con Astro y TypeScript.
 
 ## Stack Tecnologico
 
-- **Framework**: Astro 4.x
+- **Framework**: Astro 4.x (Static Site Generation)
 - **Lenguaje**: TypeScript
-- **Estilos**: CSS vanilla
-- **Hosting**: Vercel
+- **Estado**: Nano Stores + @nanostores/persistent (carrito de cotizacion)
+- **Estilos**: CSS vanilla con variables CSS
+- **Tipografia**: Inter (Google Fonts)
+- **Hosting**: Vercel (free tier)
 
-## Estructura del Proyecto
+## Caracteristicas
+
+- Catalogo de productos con busqueda y filtrado por categoria
+- Carrito de cotizacion persistente (sobrevive recarga y navegacion)
+- Detalle de producto con tablas de especificaciones y descarga de ficha tecnica
+- Formulario de cotizacion con validacion de RUC peruano (algoritmo Modulo 11)
+- Centro de documentacion para procesos de licitacion
+- Paginas legales (terminos y condiciones, politica de privacidad Ley 29733)
+- Pagina 404 personalizada
+- SEO dinamico con meta tags y Open Graph por producto
+- Accesibilidad WCAG 2.1 (skip link, focus-visible, ARIA roles)
+- Navegacion responsive con menu hamburguesa
+
+## Arquitectura
 
 ```
-frontend/
-├── src/
-│   ├── components/     # componentes reutilizables
-│   ├── layouts/        # layouts de pagina
-│   ├── pages/          # paginas de la aplicacion
-│   ├── lib/            # utilidades y cliente api
-│   └── env.d.ts        # definiciones de tipos para variables de entorno
-├── public/             # archivos estaticos
-├── astro.config.mjs    # configuracion de astro
-├── tsconfig.json       # configuracion de typescript
-├── package.json        # dependencias
-├── .env.example        # plantilla de variables de entorno
-└── README.md
+frontend/src/
+├── layouts/
+│   └── Layout.astro         # Layout base con SEO, OG, Inter font
+├── components/
+│   ├── Navbar.astro          # Nav sticky con badge de carrito
+│   └── Footer.astro          # Footer con links legales
+├── lib/
+│   ├── api.ts                # Cliente API tipado
+│   ├── validation.ts         # Validacion RUC, telefono, email
+│   └── stores/
+│       └── quoteCart.ts      # Store persistente del carrito
+├── pages/
+│   ├── index.astro           # Landing B2B
+│   ├── productos.astro       # Catalogo con filtros
+│   ├── productos/[slug].astro # Detalle con tablas y CTAs
+│   ├── cotizacion.astro      # Formulario corporativo
+│   ├── documentacion.astro   # Centro documental
+│   ├── terminos.astro        # Terminos y condiciones
+│   ├── privacidad.astro      # Politica de privacidad
+│   └── 404.astro             # Error 404
 ```
 
-## Instalacion
+## Comenzando
 
-1. Instalar dependencias:
+### Prerequisitos
+
+- Node.js 18+
+- Backend corriendo en `http://localhost:3000` (necesario para build)
+
+### Instalacion
 
 ```bash
 npm install
-```
-
-2. Configurar variables de entorno:
-
-```bash
 cp .env.example .env
-```
-
-3. Editar `.env` con la URL del backend:
-
-```env
-PUBLIC_API_URL=http://localhost:3000
-```
-
-## Desarrollo
-
-Iniciar servidor de desarrollo:
-
-```bash
 npm run dev
 ```
 
-El sitio estara disponible en `http://localhost:4321`
+El frontend estara disponible en `http://localhost:4321`
 
-## Build
-
-Generar build de produccion:
+### Build
 
 ```bash
 npm run build
 ```
 
-Previsualizar build:
+> El backend debe estar corriendo para que `getStaticPaths` genere las paginas de productos.
 
-```bash
-npm run preview
-```
+## Paleta de Colores
+
+| Variable               | Valor   | Uso                          |
+| ---------------------- | ------- | ---------------------------- |
+| `--azul-institucional` | #1e40af | Acciones principales, navbar |
+| `--azul-hover`         | #1e3a8a | Hover de botones             |
+| `--gris-pizarra`       | #475569 | Textos secundarios           |
+| `--gris-texto`         | #1f2937 | Textos principales           |
+| `--gris-fondo`         | #f8fafc | Fondo de pagina              |
 
 ## Variables de Entorno
 
-- `PUBLIC_API_URL`: URL del backend API (requerida)
-
-## Paginas Disponibles
-
-- `/` - Pagina de inicio
-- `/productos` - Listado de productos
-- `/productos/[slug]` - Detalle de producto
-- `/cotizacion` - Formulario de cotizacion
-- `/admin` - Panel administrativo (proximamente)
-
-## Deployment
-
-El frontend esta configurado para deployment en Vercel:
-
-1. Conectar repositorio en Vercel
-2. Configurar variable de entorno `PUBLIC_API_URL` con la URL del backend en produccion
-3. Deploy automatico en cada push a main
-
-## Licencia
-
-Propietario - LabMedical
+- `PUBLIC_API_URL`: URL del backend API (default: `http://localhost:3000`)
