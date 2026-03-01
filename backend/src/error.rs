@@ -6,54 +6,113 @@ use axum::{
 use serde_json::json;
 use thiserror::Error;
 
+// codigos de error estandarizados, o sea nunca se exponen 
+// detalles internos al cliente
 #[derive(Error, Debug)]
 pub enum ApiError {
-    #[error("Database error: {0}")]
+    #[error("Error de base de datos")]
     Database(#[from] sqlx::Error),
     
-    #[error("Authentication error: {0}")]
+    #[error("Error de autenticacion")]
     Auth(String),
     
-    #[error("Validation error: {0}")]
+    #[error("Error de validacion")]
     Validation(String),
     
-    #[error("Not found: {0}")]
+    #[error("Recurso no encontrado")]
     NotFound(String),
     
-    #[error("Internal server error: {0}")]
+    #[error("Error interno del servidor")]
     Internal(String),
     
-    #[error("Bad request: {0}")]
+    #[error("Solicitud invalida")]
     BadRequest(String),
     
-    #[error("Unauthorized")]
+    #[error("No autorizado")]
     Unauthorized,
     
-    #[error("Rate limit exceeded")]
+    #[error("Lmite de solicitudes excedido")]
     RateLimitExceeded,
+
+    #[error("RUC invalido")]
+    InvalidRuc,
 }
 
 impl IntoResponse for ApiError {
     fn into_response(self) -> Response {
-        let (status, error_message) = match self {
+        let (status, code, message) = match self {
             ApiError::Database(ref e) => {
-                tracing::error!("Database error: {:?}", e);
-                (StatusCode::INTERNAL_SERVER_ERROR, "Database error occurred")
+                // loguear error real internamente, nunca exponer al cliente
+                tracing::error!(
+                    error_type = "database",
+                    details = %e,
+                    "Error de base de datos"
+                );
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "ERR_INTERNAL_SERVER",
+                    "Error interno del servidor".to_string(),
+                )
             }
-            ApiError::Auth(ref msg) => (StatusCode::UNAUTHORIZED, msg.as_str()),
-            ApiError::Validation(ref msg) => (StatusCode::BAD_REQUEST, msg.as_str()),
-            ApiError::NotFound(ref msg) => (StatusCode::NOT_FOUND, msg.as_str()),
+            ApiError::Auth(ref msg) => {
+                tracing::warn!(
+                    error_type = "auth",
+                    details = %msg,
+                    "Intento de autenticación fallido"
+                );
+                (
+                    StatusCode::UNAUTHORIZED,
+                    "ERR_UNAUTHORIZED",
+                    "Credenciales inválidas".to_string(),
+                )
+            }
+            ApiError::Validation(ref msg) => (
+                StatusCode::BAD_REQUEST,
+                "ERR_VALIDATION",
+                format!("Error de validación: {}", msg),
+            ),
+            ApiError::NotFound(_) => (
+                StatusCode::NOT_FOUND,
+                "ERR_NOT_FOUND",
+                "Recurso no encontrado".to_string(),
+            ),
             ApiError::Internal(ref msg) => {
-                tracing::error!("Internal error: {}", msg);
-                (StatusCode::INTERNAL_SERVER_ERROR, "Internal server error")
+                tracing::error!(
+                    error_type = "internal",
+                    details = %msg,
+                    "Error interno"
+                );
+                (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    "ERR_INTERNAL_SERVER",
+                    "Error interno del servidor".to_string(),
+                )
             }
-            ApiError::BadRequest(ref msg) => (StatusCode::BAD_REQUEST, msg.as_str()),
-            ApiError::Unauthorized => (StatusCode::UNAUTHORIZED, "Unauthorized"),
-            ApiError::RateLimitExceeded => (StatusCode::TOO_MANY_REQUESTS, "Rate limit exceeded"),
+            ApiError::BadRequest(ref msg) => (
+                StatusCode::BAD_REQUEST,
+                "ERR_BAD_REQUEST",
+                msg.clone(),
+            ),
+            ApiError::Unauthorized => (
+                StatusCode::UNAUTHORIZED,
+                "ERR_UNAUTHORIZED",
+                "No autorizado".to_string(),
+            ),
+            ApiError::RateLimitExceeded => (
+                StatusCode::TOO_MANY_REQUESTS,
+                "ERR_RATE_LIMIT",
+                "Demasiadas solicitudes, intente en unos minutos".to_string(),
+            ),
+            ApiError::InvalidRuc => (
+                StatusCode::BAD_REQUEST,
+                "ERR_INVALID_RUC",
+                "El RUC proporcionado no es valido".to_string(),
+            ),
         };
 
         let body = Json(json!({
-            "error": error_message,
+            "code": code,
+            "message": message,
         }));
 
         (status, body).into_response()
