@@ -26,6 +26,9 @@ scripts/*.secret
 *.swp
 *.swo
 
+# Instrucciones del agente (NO subir al repo)
+.agent/
+
 # OS
 .DS_Store
 Thumbs.db
