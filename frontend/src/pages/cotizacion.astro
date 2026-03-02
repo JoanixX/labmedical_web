@@ -18,6 +18,7 @@ import Layout from '../layouts/Layout.astro';
             <tr>
               <th>Producto</th>
               <th>Marca</th>
+              <th>Cantidad (uds.)</th>
               <th></th>
             </tr>
           </thead>
@@ -68,19 +69,13 @@ import Layout from '../layouts/Layout.astro';
 
           <div class="form-group">
             <label for="phone">Telefono <span class="required">*</span></label>
-            <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="numeric" placeholder="+51 999 999 999" />
+            <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="numeric" placeholder="+51 123 456 789" />
             <span class="field-error" id="error_phone"></span>
           </div>
         </div>
 
         <div class="form-section">
           <h2>Detalles de la Cotizacion</h2>
-          
-          <div class="form-group">
-            <label for="estimated_quantity">Cantidad Estimada <span class="required">*</span></label>
-            <input type="text" id="estimated_quantity" name="estimated_quantity" placeholder="Ej: 10 unidades" />
-            <span class="field-error" id="error_estimated_quantity"></span>
-          </div>
 
           <div class="form-group">
             <label for="message">Observaciones / Referencia de Licitacion</label>
@@ -107,7 +102,7 @@ import Layout from '../layouts/Layout.astro';
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         <h2>Error al Enviar</h2>
         <p id="errorText">Ocurrio un error al procesar su solicitud.</p>
-        <p class="error-contact">Contactenos directamente: <strong>ventas@labmedical.com</strong> o <strong>+51 999 999 999</strong></p>
+        <p class="error-contact">Contactenos directamente: <strong>labmedicalbusinesssa@gmail.com</strong> o <strong>+51 997 392 467</strong></p>
         <button class="btn-retry" id="retryBtn">Intentar de Nuevo</button>
       </div>
     </div>
@@ -186,6 +181,21 @@ import Layout from '../layouts/Layout.astro';
 
   .cart-table .btn-remove:hover {
     background: #fef2f2;
+  }
+
+  .qty-input {
+    width: 80px;
+    padding: 0.375rem 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    font-size: 0.875rem;
+    font-family: inherit;
+    text-align: center;
+  }
+
+  .qty-input:focus {
+    outline: none;
+    border-color: var(--azul-institucional);
   }
 
   .cart-hint {
@@ -394,7 +404,7 @@ import Layout from '../layouts/Layout.astro';
 </style>
 
 <script>
-  import { quoteCart, removeFromCart, clearCart, getCartProductIds } from '../lib/stores/quoteCart';
+  import { quoteCart, removeFromCart, updateQuantity, clearCart, getCartProductIds } from '../lib/stores/quoteCart';
   import { validateRuc, validatePhone, validateEmail, validateRequired } from '../lib/validation';
 
   const form = document.getElementById('quoteForm') as HTMLFormElement;
@@ -405,7 +415,7 @@ import Layout from '../layouts/Layout.astro';
   const errorMessage = document.getElementById('errorMessage')!;
   const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement;
 
-  // Renderizar carrito
+  // Renderizar carrito con cantidad editable
   function renderCart() {
     const items = quoteCart.get();
     if (items.length === 0) {
@@ -420,10 +430,24 @@ import Layout from '../layouts/Layout.astro';
       <tr>
         <td><a href="/productos/${item.slug}">${item.name}</a></td>
         <td>${item.brand}</td>
+        <td>
+          <input type="number" class="qty-input" data-id="${item.id}" value="${item.quantity}" min="1" max="9999" />
+        </td>
         <td><button class="btn-remove" data-id="${item.id}">Quitar</button></td>
       </tr>
     `).join('');
 
+    // Listeners de cantidad
+    cartBody.querySelectorAll('.qty-input').forEach(input => {
+      input.addEventListener('change', () => {
+        const el = input as HTMLInputElement;
+        const qty = Math.max(1, parseInt(el.value) || 1);
+        el.value = qty.toString();
+        updateQuantity(Number(el.dataset.id), qty);
+      });
+    });
+
+    // Listeners de quitar
     cartBody.querySelectorAll('.btn-remove').forEach(btn => {
       btn.addEventListener('click', () => {
         removeFromCart(Number((btn as HTMLElement).dataset.id));
@@ -471,10 +495,14 @@ import Layout from '../layouts/Layout.astro';
     const phoneCheck = validatePhone(getValue('phone'));
     if (!phoneCheck.valid) { showFieldError('phone', phoneCheck.error); valid = false; }
 
-    const qtyCheck = validateRequired(getValue('estimated_quantity'), 'Cantidad Estimada');
-    if (!qtyCheck.valid) { showFieldError('estimated_quantity', qtyCheck.error); valid = false; }
-
     return valid;
+  }
+
+  // Construir string de cantidades para el backend: "Producto A: 10 uds, Producto B: 5 uds"
+  function buildEstimatedQuantity(): string {
+    const items = quoteCart.get();
+    if (items.length === 0) return 'Consulta general';
+    return items.map(item => `${item.name}: ${item.quantity} uds`).join(', ');
   }
 
   // Enviar formulario
@@ -484,7 +512,6 @@ import Layout from '../layouts/Layout.astro';
 
     const productIds = getCartProductIds();
     if (productIds.length === 0) {
-      // Si no hay productos en carrito, usar [1] como fallback
       productIds.push(1);
     }
 
@@ -499,7 +526,7 @@ import Layout from '../layouts/Layout.astro';
       email: formData.get('email') as string,
       phone: formData.get('phone') as string,
       product_ids: productIds,
-      estimated_quantity: formData.get('estimated_quantity') as string,
+      estimated_quantity: buildEstimatedQuantity(),
       message: formData.get('message') as string || '',
     };
 
@@ -517,18 +544,23 @@ import Layout from '../layouts/Layout.astro';
         throw new Error(result.message || 'Error al enviar cotizacion');
       }
 
+      // Guardar referencia antes de limpiar carrito
+      const cartItems = quoteCart.get();
+
       // Mostrar exito
       form.style.display = 'none';
       cartSection.style.display = 'none';
       emptyCartMsg.style.display = 'none';
       
       const summary = document.getElementById('successSummary')!;
+      const productLines = cartItems.map(p => `${p.name} — ${p.quantity} uds`).join('<br>');
       summary.innerHTML = `
         <p><strong>Empresa:</strong> ${data.company_name}</p>
         <p><strong>RUC:</strong> ${data.company_tax_id}</p>
         <p><strong>Contacto:</strong> ${data.contact_name}</p>
         <p><strong>Email:</strong> ${data.email}</p>
-        <p><strong>Productos:</strong> ${quoteCart.get().map(p => p.name).join(', ') || 'Consulta general'}</p>
+        <p><strong>Productos:</strong></p>
+        <p>${productLines || 'Consulta general'}</p>
       `;
       successMessage.style.display = 'block';
       clearCart();
