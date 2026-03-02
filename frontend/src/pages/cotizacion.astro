@@ -2,12 +2,12 @@
 import Layout from '../layouts/Layout.astro';
 ---
 
-<Layout title="Solicitar Cotizacion - LabMedical" description="Solicite cotizacion de equipos medicos con su RUC. Respuesta en menos de 24 horas habiles.">
+<Layout title="Solicitar Cotización - LabMedical" description="Solicite cotización de equipos médicos con su RUC. Respuesta en menos de 24 horas hábiles.">
   <div class="quote-page">
     <div class="container">
       <div class="page-header">
-        <h1>Solicitar Cotizacion</h1>
-        <p>Complete el formulario con los datos de su empresa. Le responderemos en menos de 24 horas habiles.</p>
+        <h1>Solicitar Cotización</h1>
+        <p>Complete el formulario con los datos de su empresa. Le responderemos en menos de 24 horas hábiles.</p>
       </div>
 
       <!-- Productos seleccionados -->
@@ -37,7 +37,7 @@ import Layout from '../layouts/Layout.astro';
           
           <div class="form-row">
             <div class="form-group">
-              <label for="company_name">Razon Social <span class="required">*</span></label>
+              <label for="company_name">Razón Social <span class="required">*</span></label>
               <input type="text" id="company_name" name="company_name" autocomplete="organization" />
               <span class="field-error" id="error_company_name"></span>
             </div>
@@ -68,41 +68,41 @@ import Layout from '../layouts/Layout.astro';
           </div>
 
           <div class="form-group">
-            <label for="phone">Telefono <span class="required">*</span></label>
+            <label for="phone">Teléfono <span class="required">*</span></label>
             <input type="tel" id="phone" name="phone" autocomplete="tel" inputmode="numeric" placeholder="+51 123 456 789" />
             <span class="field-error" id="error_phone"></span>
           </div>
         </div>
 
         <div class="form-section">
-          <h2>Detalles de la Cotizacion</h2>
+          <h2>Detalles de la Cotización</h2>
 
           <div class="form-group">
-            <label for="message">Observaciones / Referencia de Licitacion</label>
-            <textarea id="message" name="message" rows="4" placeholder="Numero de proceso de licitacion, especificaciones adicionales, plazos de entrega..."></textarea>
+            <label for="message">Observaciones / Referencia de Licitación</label>
+            <textarea id="message" name="message" rows="4" placeholder="Número de proceso de licitación, especificaciones adicionales, plazos de entrega..."></textarea>
           </div>
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn-submit" id="submitBtn">Enviar Solicitud de Cotizacion</button>
+          <button type="submit" class="btn-submit" id="submitBtn">Enviar Solicitud de Cotización</button>
         </div>
       </form>
 
       <!-- Estado: Exito -->
       <div id="successMessage" class="status-message success" style="display:none;">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 12l2 2 4-4"/><circle cx="12" cy="12" r="10"/></svg>
-        <h2>Cotizacion Enviada Exitosamente</h2>
-        <p>Nos pondremos en contacto con usted en menos de 24 horas habiles.</p>
+        <h2>Cotización Enviada Exitosamente</h2>
+        <p>Nos pondremos en contacto con usted en menos de 24 horas hábiles.</p>
         <div id="successSummary" class="success-summary"></div>
-        <a href="/productos" class="btn-back">Volver al Catalogo</a>
+        <a href="/productos" class="btn-back">Volver al Catálogo</a>
       </div>
 
       <!-- Estado: Error -->
       <div id="errorMessage" class="status-message error-state" style="display:none;">
         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
         <h2>Error al Enviar</h2>
-        <p id="errorText">Ocurrio un error al procesar su solicitud.</p>
-        <p class="error-contact">Contactenos directamente: <strong>labmedicalbusinesssa@gmail.com</strong> o <strong>+51 997 392 467</strong></p>
+        <p id="errorText">Ocurrió un error al procesar su solicitud.</p>
+        <p class="error-contact">Contáctenos directamente: <strong>labmedicalbusinesssa@gmail.com</strong> o <strong>+51 997 392 467</strong></p>
         <button class="btn-retry" id="retryBtn">Intentar de Nuevo</button>
       </div>
     </div>
@@ -580,7 +580,7 @@ import Layout from '../layouts/Layout.astro';
     errorMessage.style.display = 'none';
     form.style.display = 'block';
     submitBtn.disabled = false;
-    submitBtn.textContent = 'Enviar Solicitud de Cotizacion';
+    submitBtn.textContent = 'Enviar Solicitud de Cotización';
     renderCart();
   });
 </script>

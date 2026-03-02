@@ -16,23 +16,23 @@ try {
 }
 ---
 
-<Layout title="Catalogo de Productos - LabMedical" description="Catalogo tecnico de equipos medicos con registro sanitario DIGEMID. Fichas tecnicas, especificaciones y cotizaciones.">
+<Layout title="Catálogo de Productos - LabMedical" description="Catálogo técnico de equipos médicos con registro sanitario DIGEMID. Fichas técnicas, especificaciones y cotizaciones.">
   <div class="products-page">
     <div class="container">
       <div class="page-header">
-        <h1>Catalogo Tecnico</h1>
+        <h1>Catálogo Técnico</h1>
         <p>Equipos médicos con registro sanitario y ficha técnica disponible</p>
       </div>
       
       {error && (
         <div class="error-message" role="alert">
           <p><strong>{error}</strong></p>
-          <p>Asegurese de que el servidor backend este en ejecucion.</p>
+          <p>Asegúrese de que el servidor backend esté en ejecución.</p>
         </div>
       )}
 
       {!error && categories.length > 0 && (
-        <nav class="categories" aria-label="Filtrar por categoria">
+        <nav class="categories" aria-label="Filtrar por categoría">
           <div class="category-list">
             <a href="/productos" class="category-chip active">Todas</a>
             {categories.map(cat => (
@@ -69,8 +69,8 @@ try {
                     data-product-name={product.name}
                     data-product-brand={product.brand}
                     data-product-slug={product.slug}
-                    aria-label={`Agregar ${product.name} a cotizacion`}
-                    title="Agregar a cotizacion"
+                    aria-label={`Agregar ${product.name} a cotización`}
+                    title="Agregar a cotización"
                   >+ Cotizar</button>
                 </div>
               </div>
