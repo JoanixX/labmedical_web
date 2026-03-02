@@ -14,11 +14,11 @@ Frontend para la plataforma de catalogo medico B2B LabMedical, construido con As
 ## Caracteristicas
 
 - Catalogo de productos con busqueda y filtrado por categoria
-- Carrito de cotizacion persistente (sobrevive recarga y navegacion)
+- Carrito de cotizacion persistente con cantidad por producto (sobrevive recarga y navegacion)
 - Detalle de producto con tablas de especificaciones y descarga de ficha tecnica
 - Formulario de cotizacion con validacion de RUC peruano (algoritmo Modulo 11)
 - Centro de documentacion para procesos de licitacion
-- Paginas legales (terminos y condiciones, politica de privacidad Ley 29733)
+- Paginas legales detalladas (terminos y condiciones B2B, politica de privacidad Ley 29733)
 - Pagina 404 personalizada
 - SEO dinamico con meta tags y Open Graph por producto
 - Accesibilidad WCAG 2.1 (skip link, focus-visible, ARIA roles)

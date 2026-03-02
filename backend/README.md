@@ -151,7 +151,7 @@ Archivos de entorno disponibles:
 
 ## Deployment
 
-Este proyecto esta configurado para deployment en Render.com. Ver `render.yaml` para la configuracion.
+Configurado para deployment en Render.com. La configuracion se realiza desde el dashboard de Render (variables de entorno manuales, sin render.yaml).
 
 ## Licencia
 

@@ -154,12 +154,14 @@ npm run dev
 
 - Tier gratuito permanente
 - Deployment automatico desde GitHub
-- Ver `backend/render.yaml` para configuracion
+- Configuracion desde el dashboard de Render (variables de entorno manuales)
+- Root directory: `backend`
 
 ### Frontend (Vercel)
 
 - Tier gratuito permanente con CDN global
 - Deployment automatico desde GitHub
+- Root directory: `frontend`
 
 ## Seguridad
 
