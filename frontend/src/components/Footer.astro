@@ -10,25 +10,26 @@ const currentYear = new Date().getFullYear();
         <p>Proveedor profesional de equipos médicos para instituciones de salud del Perú.</p>
       </div>
       <div class="footer-section">
-        <h4>Catalogo</h4>
+        <h4>Catálogo</h4>
         <ul>
           <li><a href="/productos">Productos</a></li>
-          <li><a href="/cotizacion">Solicitar Cotizacion</a></li>
-          <li><a href="/documentacion">Documentacion</a></li>
+          <li><a href="/cotizacion">Solicitar Cotización</a></li>
+          <li><a href="/documentacion">Documentación</a></li>
         </ul>
       </div>
       <div class="footer-section">
         <h4>Legal</h4>
         <ul>
-          <li><a href="/terminos">Terminos y Condiciones</a></li>
-          <li><a href="/privacidad">Politica de Privacidad</a></li>
+          <li><a href="/terminos">Términos y Condiciones</a></li>
+          <li><a href="/privacidad">Política de Privacidad</a></li>
         </ul>
       </div>
       <div class="footer-section">
         <h4>Contacto</h4>
-        <p>Email: labmedicalbusinesssa@gmail.com</p>
-        <p>Telefono: +51 997 392 467</p>
-        <p>Lima, Peru</p>
+        <p class="contact-label">Email:</p>
+        <p class="contact-value">labmedicalbusinesssa@gmail.com</p>
+        <p>Teléfono: +51 997 392 467</p>
+        <p>Lima, Perú</p>
       </div>
     </div>
     <div class="footer-bottom">
@@ -77,6 +78,17 @@ const currentYear = new Date().getFullYear();
     color: #cbd5e1;
     font-size: 0.9375rem;
     line-height: 1.7;
+  }
+
+  .contact-label {
+    color: #94a3b8;
+    font-size: 0.8125rem;
+    margin-bottom: 0;
+  }
+
+  .contact-value {
+    word-break: break-all;
+    margin-top: 0;
   }
 
   .footer-section ul {
