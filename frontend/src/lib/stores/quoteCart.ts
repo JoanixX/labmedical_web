@@ -9,6 +9,7 @@ export interface QuoteCartItem {
   name: string;
   brand: string;
   slug: string;
+  quantity: number;
 }
 
 // el store persistente sobrevive a recargas y navegacion
@@ -21,12 +22,30 @@ export const quoteCart = persistentAtom<QuoteCartItem[]>(
   },
 );
 
-// se agrega producto al carrito (evita duplicados)
-export function addToCart(item: QuoteCartItem): void {
+// se agrega producto al carrito (evita duplicados, default quantity = 1)
+export function addToCart(
+  item: Omit<QuoteCartItem, "quantity">,
+  quantity: number = 1,
+): void {
   const current = quoteCart.get();
-  if (!current.find((p) => p.id === item.id)) {
-    quoteCart.set([...current, item]);
+  const existing = current.find((p) => p.id === item.id);
+  if (existing) {
+    // si ya existe, sumar cantidad
+    quoteCart.set(
+      current.map((p) =>
+        p.id === item.id ? { ...p, quantity: p.quantity + quantity } : p,
+      ),
+    );
+  } else {
+    quoteCart.set([...current, { ...item, quantity }]);
   }
+}
+
+// actualizar cantidad de un producto
+export function updateQuantity(id: number, quantity: number): void {
+  if (quantity < 1) return;
+  const current = quoteCart.get();
+  quoteCart.set(current.map((p) => (p.id === id ? { ...p, quantity } : p)));
 }
 
 // se quita producto del carrito
